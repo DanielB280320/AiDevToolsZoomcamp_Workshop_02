@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Kickboard">
+  <defs>
+    <linearGradient id="kickboard-shield" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4ade80" />
+      <stop offset="0.5" stop-color="#10b981" />
+      <stop offset="1" stop-color="#0e7490" />
+    </linearGradient>
+  </defs>
+
+  <!-- Shield -->
+  <path d="M32 2.5C41 6.3 49.3 8 57 8v21c0 16.3-10.4 26.8-25 32.5C17.4 55.8 7 45.3 7 29V8c7.7 0 16-1.7 25-5.5z" fill="url(#kickboard-shield)" />
+  <path d="M32 2.5C41 6.3 49.3 8 57 8v21c0 16.3-10.4 26.8-25 32.5z" fill="#04283a" opacity="0.14" />
+  <path d="M32 7.2c7.9 3.2 15.2 4.8 21 5v16.8c0 13.7-8.6 22.8-21 28-12.4-5.2-21-14.3-21-28V12.2c5.8-.2 13.1-1.8 21-5z" fill="none" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.4" />
+
+  <!-- K: the upper arm points at the ball it just kicked -->
+  <g fill="#ffffff">
+    <rect x="18" y="17" width="8" height="29" rx="1.2" />
+    <path d="M26 27.5 34.8 19.6 40.3 24.6 26 37.5z" />
+    <path d="M28.5 30.8 44.3 46H33.9L23.3 35.8z" />
+  </g>
+
+  <!-- Ball -->
+  <circle cx="43" cy="17.5" r="5.3" fill="#ffffff" />
+  <g fill="none" stroke="#0f766e" stroke-width="0.9" stroke-linecap="round">
+    <path d="M43 15.4V12.2M45 16.85 48 15.9M44.23 19.2 46.1 21.8M41.77 19.2 39.9 21.8M41 16.85 38 15.9" />
+  </g>
+  <path d="M43 15.4 45 16.85 44.23 19.2H41.77L41 16.85z" fill="#0f766e" />
+</svg>

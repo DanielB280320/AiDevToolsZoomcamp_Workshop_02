@@ -49,6 +49,10 @@ Create a new GitHub repository (or a folder in the repository you used for Homew
 
 Commit and push. What's the sha1 hash for this commit?
 
+    Answer: 
+
+    a77b7e65fc5e164834baf8b6f4a9eba5599ccefd
+
 
 ## Question 4: Frontend prototype
 
