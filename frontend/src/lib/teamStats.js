@@ -56,6 +56,11 @@ export function groupSquadByPosition(squad) {
     ...position,
     players: squad
       .filter((p) => p.position === position.key)
-      .sort((a, b) => a.shirtNumber - b.shirtNumber),
+      .sort(byShirtNumber),
   }));
+}
+
+/** Shirt number ascending; players without one (live data can omit it) go last, by name. */
+function byShirtNumber(a, b) {
+  return (a.shirtNumber ?? Infinity) - (b.shirtNumber ?? Infinity) || a.name.localeCompare(b.name);
 }

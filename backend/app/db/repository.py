@@ -1,0 +1,19 @@
+from typing import Protocol
+
+from app.db.models import League, Match, Player, Team
+
+
+class Repository(Protocol):
+    """Data access used by the API. Implemented in memory for now; a SQLAlchemy version replaces it later."""
+
+    def list_leagues(self) -> list[League]: ...
+
+    def get_league(self, league_id: str) -> League | None: ...
+
+    def list_teams(self, league_id: str) -> list[Team]: ...
+
+    def get_team(self, team_id: str) -> Team | None: ...
+
+    def list_players(self, team_id: str) -> list[Player]: ...
+
+    def list_matches(self, league_id: str) -> list[Match]: ...

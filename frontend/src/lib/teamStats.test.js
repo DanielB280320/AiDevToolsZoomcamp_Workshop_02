@@ -28,6 +28,18 @@ describe('compositeScore', () => {
   });
 });
 
+describe('groupSquadByPosition without shirt numbers', () => {
+  it('puts players without a shirt number last, ordered by name', () => {
+    const forwards = [
+      { id: 'b', name: 'Zed Unnumbered', position: 'FWD', goals: 0, assists: 0 },
+      { id: 'c', name: 'Abe Unnumbered', position: 'FWD', goals: 0, assists: 0 },
+      { id: 'a', name: 'Nine', position: 'FWD', shirtNumber: 9, goals: 0, assists: 0 },
+    ];
+    const group = groupSquadByPosition(forwards).find((g) => g.key === 'FWD');
+    expect(group.players.map((p) => p.id)).toEqual(['a', 'c', 'b']);
+  });
+});
+
 describe('topScorer', () => {
   it('returns the player with most goals, breaking ties by assists', () => {
     expect(topScorer(squad).id).toBe('mid');

@@ -1,0 +1,430 @@
+openapi: 3.1.0
+info:
+  title: Kickboard API
+  version: 0.1.0
+  description: |
+    Backend contract expected by the Kickboard frontend (`frontend/src/api/kickboardApi.js`).
+    The response shapes below mirror the in-memory mock in `frontend/src/api/mock/`, so the
+    real backend can replace the mock without changes to UI components.
+
+    **Authentication:** none. Every endpoint is public and read-only — user accounts are out of
+    scope in `_docs/specs.md` §11, and the client sends no credentials.
+
+    **Data:** live data from API-Football when the backend has `API_FOOTBALL_KEY` set, otherwise the
+    generated mock database. Provider responses are cached, so standings can lag by up to 30 minutes.
+
+    **Errors:** non-2xx responses carry an `Error` body. The client surfaces them as an `ApiError`
+    with the HTTP `status` and the `detail` text as its message; the UI hides "Retry" for 404s.
+    A `503` means the sports data provider failed (outage, exhausted quota) and nothing was cached.
+servers:
+  - url: http://localhost:8000
+    description: Local development
+
+# No endpoint requires authentication.
+security: []
+
+tags:
+  - name: leagues
+  - name: teams
+
+paths:
+  /api/leagues:
+    get:
+      tags: [leagues]
+      operationId: listLeagues
+      summary: List all competitions
+      description: |
+        Returns every competition shown in the sidebar (client: `getLeagues()`).
+        The sidebar groups leagues by `region`.
+      security: []
+      responses:
+        '200':
+          description: All leagues.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/League'
+
+  /api/leagues/{leagueId}/standings:
+    get:
+      tags: [leagues]
+      operationId: getLeagueStandings
+      summary: Get a league's standings table
+      description: |
+        Returns the league and its table (client: `getStandings(leagueId)`).
+        `teams` is sorted by `position` ascending (1 = top). Ranking order is points, then goal
+        difference, then goals scored, then team name.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/LeagueId'
+      responses:
+        '200':
+          description: The league and its standings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Standings'
+        '404':
+          description: No league with this id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: League not found
+        '503':
+          $ref: '#/components/responses/ProviderUnavailable'
+
+  /api/teams/{teamId}:
+    get:
+      tags: [teams]
+      operationId: getTeamDetail
+      summary: Get team detail
+      description: |
+        Returns the team's standings row, its league, full squad and last 5 matches
+        (client: `getTeamDetail(teamId)`).
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/TeamId'
+      responses:
+        '200':
+          description: Team detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamDetail'
+        '404':
+          description: No team with this id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: Team not found
+        '503':
+          $ref: '#/components/responses/ProviderUnavailable'
+
+components:
+  responses:
+    ProviderUnavailable:
+      description: The sports data provider failed and no cached copy is available.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            detail: 'Sports data provider error: You have reached the request limit for the day'
+
+  parameters:
+    LeagueId:
+      name: leagueId
+      in: path
+      required: true
+      description: League slug.
+      schema:
+        type: string
+        example: premier-league
+    TeamId:
+      name: teamId
+      in: path
+      required: true
+      description: |
+        Team id. A club gets one team per competition it plays in, so the id is scoped to the
+        league: `{leagueId}--{clubSlug}` in the mock data, `{leagueId}--{providerTeamId}` with live data.
+      schema:
+        type: string
+        example: premier-league--liverpool
+
+  schemas:
+    HexColor:
+      type: string
+      pattern: '^#[0-9A-Fa-f]{6}$'
+      example: '#3D1159'
+
+    League:
+      type: object
+      required: [id, name, country, region, code, logo, logoBackground, season, color]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          example: premier-league
+        name:
+          type: string
+          example: Premier League
+        country:
+          type: string
+          description: Country, or area for multi-country/continental competitions.
+          example: England
+        region:
+          type: string
+          description: Sidebar group.
+          enum: [Europe, Americas, Continental]
+        code:
+          type: string
+          description: Three-letter code.
+          pattern: '^[A-Z]{3}$'
+          example: ENG
+        logo:
+          type: string
+          format: uri
+          example: https://r2.thesportsdb.com/images/media/league/badge/gasy9d1737743125.png/small
+        logoBackground:
+          $ref: '#/components/schemas/HexColor'
+          description: Background of the tile behind the logo (`#ffffff` unless the logo needs contrast).
+        season:
+          type: string
+          example: 2026–27
+        color:
+          $ref: '#/components/schemas/HexColor'
+          description: League accent colour.
+
+    Crest:
+      type: object
+      required: [code, color]
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+          description: Short club code, shown when there is no logo or the logo fails to load.
+          example: LIV
+        color:
+          $ref: '#/components/schemas/HexColor'
+          description: Primary club colour, used as an accent. Live data has no club colours, so the league colour is used.
+        logo:
+          type: string
+          format: uri
+          example: https://r2.thesportsdb.com/images/media/team/badge/kfaher1737969724.png/small
+
+    TeamSummary:
+      type: object
+      required: [id, name, crest]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          example: premier-league--liverpool
+        name:
+          type: string
+          example: Liverpool
+        crest:
+          $ref: '#/components/schemas/Crest'
+
+    Team:
+      description: A team together with its row in the league table.
+      type: object
+      required:
+        - id
+        - name
+        - leagueId
+        - crest
+        - position
+        - played
+        - wins
+        - draws
+        - losses
+        - goalsFor
+        - goalsAgainst
+        - goalDifference
+        - points
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          example: premier-league--liverpool
+        name:
+          type: string
+          example: Liverpool
+        leagueId:
+          type: string
+          example: premier-league
+        crest:
+          $ref: '#/components/schemas/Crest'
+        position:
+          type: integer
+          minimum: 1
+        played:
+          type: integer
+          minimum: 0
+          description: Equals `wins + draws + losses`.
+        wins:
+          type: integer
+          minimum: 0
+        draws:
+          type: integer
+          minimum: 0
+        losses:
+          type: integer
+          minimum: 0
+        goalsFor:
+          type: integer
+          minimum: 0
+        goalsAgainst:
+          type: integer
+          minimum: 0
+        goalDifference:
+          type: integer
+          description: Equals `goalsFor - goalsAgainst`.
+        points:
+          type: integer
+          description: |
+            `wins * 3 + draws`. Live data uses the provider's figure, which includes any points deductions
+            (so it can be lower, even negative).
+
+    Standings:
+      type: object
+      required: [league, teams]
+      additionalProperties: false
+      properties:
+        league:
+          $ref: '#/components/schemas/League'
+        teams:
+          type: array
+          description: Sorted by `position` ascending.
+          items:
+            $ref: '#/components/schemas/Team'
+
+    Position:
+      type: string
+      enum: [GK, DEF, MID, FWD]
+
+    Player:
+      type: object
+      required: [id, teamId, name, position, goals, assists]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          example: premier-league--liverpool--9
+        teamId:
+          type: string
+          example: premier-league--liverpool
+        name:
+          type: string
+          example: Jack Walker
+        position:
+          $ref: '#/components/schemas/Position'
+        shirtNumber:
+          type: integer
+          minimum: 1
+          description: Omitted when the player has no registered number.
+          example: 9
+        goals:
+          type: integer
+          minimum: 0
+          description: |
+            Season total for this team. In the mock data squad goals add up to the team's `goalsFor`; live
+            data can differ (own goals, players who have left).
+        assists:
+          type: integer
+          minimum: 0
+          description: Season total for this team.
+
+    PlayerRating:
+      description: One player's performance in a match. Only players who played and were rated appear.
+      type: object
+      required: [playerId, goals, assists, rating, minutesPlayed]
+      additionalProperties: false
+      properties:
+        playerId:
+          type: string
+        goals:
+          type: integer
+          minimum: 0
+        assists:
+          type: integer
+          minimum: 0
+        rating:
+          type: number
+          minimum: 0
+          maximum: 10
+          description: Match rating, one decimal place.
+          example: 7.4
+        minutesPlayed:
+          type: integer
+          minimum: 1
+          maximum: 120
+          description: Up to 120 when a match goes to extra time.
+
+    Match:
+      type: object
+      required:
+        - id
+        - leagueId
+        - homeTeamId
+        - awayTeamId
+        - homeScore
+        - awayScore
+        - date
+        - playerRatings
+        - homeTeam
+        - awayTeam
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          example: premier-league--r12-m1
+        leagueId:
+          type: string
+          example: premier-league
+        round:
+          type: integer
+          minimum: 1
+          description: Matchday number. Omitted for rounds without one (e.g. play-offs, finals).
+        homeTeamId:
+          type: string
+        awayTeamId:
+          type: string
+        homeScore:
+          type: integer
+          minimum: 0
+        awayScore:
+          type: integer
+          minimum: 0
+        date:
+          type: string
+          format: date
+          example: '2026-09-12'
+        playerRatings:
+          type: array
+          description: |
+            Ratings for both sides. In the mock data goals per side add up to that side's score; live data
+            can differ (own goals, unrated players). Empty when the provider has no player statistics.
+          items:
+            $ref: '#/components/schemas/PlayerRating'
+        homeTeam:
+          $ref: '#/components/schemas/TeamSummary'
+        awayTeam:
+          $ref: '#/components/schemas/TeamSummary'
+
+    TeamDetail:
+      type: object
+      required: [team, league, squad, recentMatches]
+      additionalProperties: false
+      properties:
+        team:
+          $ref: '#/components/schemas/Team'
+        league:
+          $ref: '#/components/schemas/League'
+        squad:
+          type: array
+          description: Every player registered to the team.
+          items:
+            $ref: '#/components/schemas/Player'
+        recentMatches:
+          type: array
+          description: The team's most recent matches, newest first, at most 5.
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/Match'
+
+    Error:
+      type: object
+      required: [detail]
+      properties:
+        detail:
+          type: string
+          description: Human-readable message shown to the user.
+          example: League not found

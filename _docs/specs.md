@@ -36,7 +36,11 @@ Clicking into a team shows:
 
 ## 5. Data Strategy
 - **Phase 1 (now):** Mock/sample JSON data, structured to mirror what a real API would return.
-- **Phase 2 (later):** Swap in a real sports data API (e.g. API-Football, SportRadar) without changing the frontend's data-consumption layer. All data-fetching should go through a single service/adapter module so this swap is low-friction.
+- **Phase 2 (now available):** Live data from **API-Football** (v3), switched on by setting `API_FOOTBALL_KEY` for the backend; without a key the mock data is served. The frontend is unchanged — the backend adapter maps provider data onto the same API contract.
+  - **Standings:** the provider's table, including points deductions. Split tables are reduced to one: a table containing every team wins (latest phase with games played, e.g. Liga MX Apertura/Clausura); otherwise groups are merged and ranked by points, goal difference, goals scored (e.g. MLS conferences).
+  - **Team detail:** current squad (shirt number may be missing), season goals/assists in that competition, and the last 5 finished matches in that competition with player ratings (unrated players are left out).
+  - **Crests:** provider logos; the provider has no club colours, so the league colour is the accent.
+  - **Freshness & quota:** responses are cached in memory (standings/results 30 min, player stats 6 h, seasons/squads/finished matches 24 h). If the provider fails, the last cached copy is served; with nothing cached the API returns `503`. Plans are metered per request (free plan: 100/day, with limited season access), so a paid plan is likely needed for current seasons across all 9 competitions.
 
 ## 6. Navigation & Layout
 - **Sidebar:** lists all leagues (Europe, Americas, Champions League grouped)

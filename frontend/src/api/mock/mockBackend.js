@@ -1,4 +1,4 @@
-// In-memory stand-in for the future backend. Only kickboardApi.js should import this.
+// In-memory stand-in for the backend, used by tests via mockFetch.js. The app talks to the real backend.
 import { ApiError } from '../errors.js';
 import { buildDataset } from './generate.js';
 
