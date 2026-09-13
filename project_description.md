@@ -24,6 +24,17 @@ drilling into any team to see its season details. It was built for Homework 2 of
 The full product spec is in [`_docs/specs.md`](_docs/specs.md), and the API contract is in
 [`openapi.yaml`](openapi.yaml).
 
+## Screenshots
+
+**Standings:** the sidebar of competitions and the league table (Premier League, mock data).
+
+![Kickboard standings view](_docs/screenshots/standings.png)
+
+**Team detail:** clicking a team opens a panel with the top scorer, best player in the last match, recent
+results and squad.
+
+![Kickboard team detail view](_docs/screenshots/team-detail.png)
+
 ## Architecture
 
 ```
