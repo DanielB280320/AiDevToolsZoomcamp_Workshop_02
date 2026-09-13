@@ -1,8 +1,7 @@
 import re
 from collections import Counter
 
-from app.db.memory import InMemoryRepository
-from tests.builders import league
+from tests.builders import database, league
 
 HEX_COLOR = re.compile(r"#[0-9A-Fa-f]{6}")
 LEAGUE_KEYS = {"id", "name", "country", "region", "code", "logo", "logoBackground", "season", "color"}
@@ -28,7 +27,7 @@ def test_league_fields_follow_the_contract(client):
 
 
 def test_serialises_leagues_in_repository_order_with_camel_case_keys(client_for):
-    repository = InMemoryRepository(
+    repository = database(
         leagues=[
             league("second", name="Second"),
             league("first", name="First", region="Continental", logo_background="#0B1F63"),

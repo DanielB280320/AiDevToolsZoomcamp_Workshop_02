@@ -54,7 +54,7 @@ Clicking into a team shows:
 
 ## 8. Tech Stack
 - **Frontend:** React
-- **Data layer:** Local mock JSON files now, abstracted behind a data-service module for future API integration
+- **Data layer:** Frontend calls go through one data-service module. The backend stores leagues, teams, players and matches in a SQL database through SQLAlchemy, kept database-agnostic: `DATABASE_URL` selects the database (SQLite by default; Postgres etc. later by adding a driver). An empty database is seeded with the generated mock season.
 - **Styling:** TBD at build time (e.g. Tailwind or CSS modules) — not fixed by this spec
 
 ## 9. Data Model (draft)

@@ -3,8 +3,17 @@
 from datetime import date
 
 from app.db.models import League, Match, Player, PlayerRating, Team
+from app.db.sql import SqlRepository, create_database_engine
 
 LEAGUE_ID = "test-league"
+
+
+def database(leagues=(), teams=(), players=(), matches=()):
+    """A fresh in-memory database holding just the given records."""
+    repository = SqlRepository(create_database_engine("sqlite://"))
+    repository.create_schema()
+    repository.add(leagues=leagues, teams=teams, players=players, matches=matches)
+    return repository
 
 
 def league(id=LEAGUE_ID, **overrides):

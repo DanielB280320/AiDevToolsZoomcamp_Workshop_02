@@ -1,3 +1,3 @@
-from app.db.mock.generate import build_mock_repository
+from app.db.mock.generate import MockData, generate_mock_data
 
-__all__ = ["build_mock_repository"]
+__all__ = ["MockData", "generate_mock_data"]

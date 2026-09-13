@@ -1,5 +1,4 @@
-from app.db.memory import InMemoryRepository
-from tests.builders import league, match, team
+from tests.builders import database, league, match, team
 
 
 def test_every_league_has_a_consistent_ordered_table(client):
@@ -23,7 +22,7 @@ def test_every_league_has_a_consistent_ordered_table(client):
 
 def test_ranks_by_points_then_goal_difference_then_goals_scored_then_name(client_for):
     names = ["alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel"]
-    repository = InMemoryRepository(
+    repository = database(
         leagues=[league()],
         teams=[team(name) for name in names],
         matches=[
@@ -40,7 +39,7 @@ def test_ranks_by_points_then_goal_difference_then_goals_scored_then_name(client
 
 
 def test_rows_are_computed_from_this_leagues_matches_only(client_for):
-    repository = InMemoryRepository(
+    repository = database(
         leagues=[league(), league("other-league")],
         teams=[
             team("alpha"),
@@ -109,7 +108,7 @@ def test_rows_are_computed_from_this_leagues_matches_only(client_for):
 
 
 def test_crest_logo_is_omitted_when_missing(client_for):
-    repository = InMemoryRepository(leagues=[league()], teams=[team("alpha", crest_logo=None)])
+    repository = database(leagues=[league()], teams=[team("alpha", crest_logo=None)])
 
     teams = client_for(repository).get("/api/leagues/test-league/standings").json()["teams"]
 

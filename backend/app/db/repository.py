@@ -4,7 +4,7 @@ from app.db.models import League, Match, Player, Team
 
 
 class Repository(Protocol):
-    """Data access used by the API. Implemented in memory for now; a SQLAlchemy version replaces it later."""
+    """Data access used by the API, implemented for any SQL database by `SqlRepository` (app/db/sql.py)."""
 
     def list_leagues(self) -> list[League]: ...
 

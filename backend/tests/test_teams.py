@@ -1,7 +1,6 @@
 from datetime import date
 
-from app.db.memory import InMemoryRepository
-from tests.builders import league, match, player, rating, team
+from tests.builders import database, league, match, player, rating, team
 
 
 def standings_row(client, league_id, team_name):
@@ -58,7 +57,7 @@ def test_recent_matches_are_the_five_newest_with_team_summaries(client_for):
         for day in (3, 1, 7, 5, 2, 6)  # stored out of order on purpose
     ]
     unrelated = match("bravo", "charlie", 4, 4, on=date(2026, 8, 9), round=9)
-    repository = InMemoryRepository(
+    repository = database(
         leagues=[league()],
         teams=[team("alpha"), team("bravo", crest_logo=None), team("charlie")],
         matches=[*fixtures, unrelated],
@@ -87,7 +86,7 @@ def test_recent_matches_are_the_five_newest_with_team_summaries(client_for):
 
 
 def test_squad_season_totals_are_summed_from_match_ratings(client_for):
-    repository = InMemoryRepository(
+    repository = database(
         leagues=[league()],
         teams=[team("alpha"), team("bravo")],
         players=[

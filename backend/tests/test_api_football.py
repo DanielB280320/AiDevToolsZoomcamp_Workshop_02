@@ -7,10 +7,9 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api_football import ApiFootballClient, ApiFootballSource
-from app.db.memory import InMemoryRepository
 from app.main import app
 from app.sources import RepositorySource, get_data_source
-from tests.builders import league
+from tests.builders import database, league
 from tests.test_contract import assert_matches_schema
 
 PREMIER_LEAGUE, MLS, ARGENTINA, LIGA_MX = 39, 253, 128, 262
@@ -54,7 +53,7 @@ def provider():
 
 @pytest.fixture
 def api(provider):
-    repository = InMemoryRepository(
+    repository = database(
         leagues=[
             league("premier-league", name="Premier League", season="2025–26", color="#3D1159"),
             league("mls", name="MLS", region="Americas", season="2025"),

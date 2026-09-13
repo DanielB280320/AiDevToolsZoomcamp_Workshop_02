@@ -33,13 +33,18 @@ Tests don't need it: `src/test/setup.js` stubs `fetch` with the in-memory mock i
 
 The API contract is `openapi.yaml` at the repository root; `backend/tests/test_contract.py` checks responses against it.
 Data access goes through the `Repository` protocol (`backend/app/db/repository.py`), provided by `get_repository` in
-`backend/app/db/__init__.py`. It currently returns an in-memory mock database (`backend/app/db/mock/`).
+`backend/app/db/__init__.py`. It returns `SqlRepository` (`backend/app/db/sql.py`, tables in `backend/app/db/tables.py`),
+connected to `DATABASE_URL` — any SQLAlchemy URL; default `sqlite:///backend/kickboard.db`. At startup missing tables
+are created (`create_all`, no migrations yet) and an empty database is loaded with the generated mock data
+(`backend/app/db/mock/`). Delete `kickboard.db` to regenerate it. Only portable column types; no SQLite-specific SQL
+outside `create_database_engine`. Another database only needs its driver (e.g. `uv add psycopg`) and a URL.
 
 Endpoints read from a `DataSource` (`backend/app/sources.py`, dependency `get_data_source`):
 - `API_FOOTBALL_KEY` set (e.g. in `backend/.env`, see `backend/.env.example`) → live data from API-Football
   (`backend/app/api_football/`). League presentation still comes from the repository; responses are cached in memory.
-- Not set → `RepositorySource`, which serves the repository (mock).
-Tests never hit the network: `conftest.py` forces the mock, and `tests/test_api_football.py` uses a fake provider.
+- Not set → `RepositorySource`, which serves the repository (the database).
+Tests never hit the network or the configured database: `conftest.py` uses in-memory SQLite (`sqlite://`) with the
+mock data, `tests/builders.py:database()` builds hand-made scenarios, and `tests/test_api_football.py` uses a fake provider.
 
 ## Conventions
 - All frontend calls to the backend go through a single API/data-service module, so mocks can be swapped for the real backend (and later a real sports data API) without touching UI components.

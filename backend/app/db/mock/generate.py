@@ -1,10 +1,10 @@
-"""Generates the mock database: a fictional but deterministic season for every league in fixtures.py."""
+"""Generates the mock data loaded into an empty database: a fictional but deterministic season for every league in fixtures.py."""
 
 import math
 import random
 from datetime import date, timedelta
+from typing import NamedTuple
 
-from app.db.memory import InMemoryRepository
 from app.db.mock.fixtures import CLUBS, LEAGUES, NAME_POOLS, LeagueFixture
 from app.db.models import League, Match, Player, PlayerRating, Team
 
@@ -173,7 +173,14 @@ def generate_league(fixture: LeagueFixture) -> tuple[list[Team], list[Player], l
     return teams, players, matches
 
 
-def build_mock_repository() -> InMemoryRepository:
+class MockData(NamedTuple):
+    leagues: list[League]
+    teams: list[Team]
+    players: list[Player]
+    matches: list[Match]
+
+
+def generate_mock_data() -> MockData:
     leagues, teams, players, matches = [], [], [], []
     for fixture in LEAGUES:
         leagues.append(
@@ -193,4 +200,4 @@ def build_mock_repository() -> InMemoryRepository:
         teams += league_teams
         players += league_players
         matches += league_matches
-    return InMemoryRepository(leagues=leagues, teams=teams, players=players, matches=matches)
+    return MockData(leagues=leagues, teams=teams, players=players, matches=matches)
