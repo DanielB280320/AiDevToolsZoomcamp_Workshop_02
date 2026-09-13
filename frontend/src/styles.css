@@ -140,6 +140,11 @@ abbr[title] {
   padding: 28px clamp(16px, 4vw, 48px) 48px;
 }
 
+/* Without the team panel, centre the content in the space beside the sidebar. */
+.app:not(.app--panel-open) .main {
+  margin-inline: auto;
+}
+
 /* ---------- Sidebar ---------- */
 
 .sidebar {
