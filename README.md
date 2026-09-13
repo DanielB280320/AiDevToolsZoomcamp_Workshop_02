@@ -71,6 +71,10 @@ Iterate until you like the results.
 
 Which command do you use to start the frontend?
 
+    Answer: 
+
+    npm run dev   (run in frontend/; or `make frontend` from the repository root)
+
 
 ## Question 5: Backend
 
@@ -88,6 +92,10 @@ Write tests for the endpoints first, then implement them.
 
 Which command do you use to start the backend?
 
+    Answer: 
+
+    uv run uvicorn app.main:app --reload   (run in backend/; or `make backend` from the repository root)
+
 ## Question 6: Connect frontend and backend
 
 The backend now works (presumably) so let's connect frontent to it. Ask the coding assistant to do it.
@@ -95,6 +103,10 @@ The backend now works (presumably) so let's connect frontent to it. Ask the codi
 You can verify that the connection works manually, but you can also ask your agent to use the browser to check it for you. 
 
 Which URL does the frontend use to talk to the backend?
+
+    Answer: 
+
+    http://localhost:8000   (set by VITE_API_BASE_URL in frontend/.env)
 
 ## Question 7: Database
 
@@ -105,3 +117,7 @@ Keep the app database-agnostic and use SQLAlchemy for that.
 Make sure test still pass and add more tests if needed. Ask your agent for recommendations.
 
 Which command do you use for running tests?
+
+    Answer: 
+
+    uv run pytest   (run in backend/; or `make test` from the repository root for backend and frontend)
