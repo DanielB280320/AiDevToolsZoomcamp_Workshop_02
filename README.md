@@ -19,6 +19,9 @@ Pick the one you like most. The workflow is the same for all of them.
 
 Which project did you choose for this homework?
 
+    Answer: 
+
+    Sports-league scoreboard
 
 ## Question 2: Spec first
 
@@ -31,6 +34,9 @@ Answer its questions, then ask it to save everything to a markdown file.
 Also ask it to help you come up with the name for this application. 
 What's the name you chose?
 
+    Answer: 
+    
+    Kickboard
 
 ## Question 3: GitHub Repository
 
